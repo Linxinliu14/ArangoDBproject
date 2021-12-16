@@ -1,0 +1,40 @@
+/*Wood Quantity analysis*/
+
+For r in WoodOrder
+For e in WoodDetails
+Filter r.WoodDetailsID==e._key
+Let x=merge(r,e) sort r.OrderQty DESC Return { "Order QTY": x.OrderQty, "Wood Name": x.Name}
+
+/*Furniture Quantity analysis*/
+
+For a in FurnitureOrder
+For b in FurnitureDetails
+Filter a.FurnitureDetailsID==b.FurnitureDetailsID
+Let x=merge(a,b) sort a.OrderQty DESC Return { "Type": x.Type, "Name": x.Name , "Order QTY": x.OrderQty}
+
+/*Customer preference manufacture*/
+
+For a in FurnitureOrder
+For b in FurnitureDetails
+For c in Customer
+For d in Manufacture
+Filter a.FurnitureDetailsID==b.FurnitureDetailsID and a._from == c._id and a._to==d._id
+Let x=merge(a,b, c, d) 
+collect nums = d.Name
+    aggregate counts = count(d.Name) into group 
+sort counts DESC
+return {"Company Name": nums, "Count":counts}
+
+/*Customer preference transport company*/
+
+For a in FurnitureOrder
+For b in TransportCompany
+For c in Customer
+Filter a.TransportCompanyID==b._key
+and a._from == c._id
+
+Let x=merge(a,b, c) 
+collect nums = b.CompanyName
+    aggregate counts = count(b.CompanyName)
+    into group 
+sort counts DESC
